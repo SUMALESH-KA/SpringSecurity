@@ -29,16 +29,16 @@ public class AuthApiController {
   public TokenDto login(@RequestBody LoginDto loginDto) {
     return authService.login(loginDto);
   }
-
-  @PreAuthorize("isAuthenticated()")
-  @PostMapping("/logout")
-  @SecurityRequirement(name = OpenApiConstants.TOKEN_SECURITY_REQUIREMENT)
-  public void logout(HttpServletRequest httpServletRequest) {
-
-    String token =
-        Optional.ofNullable(httpServletRequest.getHeader(AuthConstants.AUTHORIZATION_HEADER))
-            .orElseThrow();
-
-    authService.logout(token);
-  }
+//
+//  @PreAuthorize("isAuthenticated()")
+//  @PostMapping("/logout")
+//  @SecurityRequirement(name = OpenApiConstants.TOKEN_SECURITY_REQUIREMENT)
+//  public void logout(HttpServletRequest httpServletRequest) {
+//
+//    String token =
+//        Optional.ofNullable(httpServletRequest.getHeader(AuthConstants.AUTHORIZATION_HEADER))
+//            .orElseThrow();
+//
+//    authService.logout(token);
+//  }
 }

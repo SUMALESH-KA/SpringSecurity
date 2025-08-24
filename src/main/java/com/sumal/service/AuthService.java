@@ -17,17 +17,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-  private final AuthUserCache authUserCache;
-
   private final UserService userService;
 
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
   public AuthService(
-      AuthUserCache authUserCache, UserService userService, PasswordEncoder passwordEncoder) {
-    this.authUserCache = authUserCache;
+          AuthUserCache authUserCache, UserService userService, PasswordEncoder passwordEncoder, JwtService jwtService) {
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
   }
 
   public TokenDto login(LoginDto loginDto) {
@@ -44,18 +43,20 @@ public class AuthService {
       throw new ApplicationAuthenticationException("Password is incorrect");
     }
 
-    String token = UUID.randomUUID().toString();
+//    String token = UUID.randomUUID().toString();
     UserResponse userResponse = userCredentials.userResponse();
 
     AuthUser authUser = new AuthUser(userResponse.id(), userResponse.roles());
 
-    authUserCache.login(token, authUser);
+//    authUserCache.login(token, authUser);
 
-    return new TokenDto(token);
+    String jwtToken = jwtService.createJwtToken(authUser);
+
+    return new TokenDto(jwtToken);
   }
 
-  public void logout(String token) {
-
-    authUserCache.logout(token);
-  }
+//  public void logout(String token) {
+//
+//    authUserCache.logout(token);
+//  }
 }

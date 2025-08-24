@@ -6,6 +6,7 @@ import com.sumal.security.authentication.UserAuthentication;
 import com.sumal.security.exception.TokenAuthenticationException;
 import com.sumal.security.user.AuthUser;
 import com.sumal.security.user.AuthUserCache;
+import com.sumal.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +21,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
   private final AuthUserCache authUserCache;
+  private final JwtService jwtService;
 
-  public SecurityAuthenticationFilter(AuthUserCache authUserCache) {
+  public SecurityAuthenticationFilter(AuthUserCache authUserCache, JwtService jwtService) {
     this.authUserCache = authUserCache;
+    this.jwtService = jwtService;
   }
 
   @Override
@@ -37,11 +40,22 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
       return;
     }
+    if(!authenticationHeader.startsWith("Bearer ")) {
+      throw new TokenAuthenticationException("bearer token is missing from the request header");
+    }
+    String jwtToken = authenticationHeader.substring(7);
 
-    AuthUser authUser =
-        authUserCache
-            .getByToken(authenticationHeader)
-            .orElseThrow(() -> new TokenAuthenticationException("Token is not valid"));
+    if(jwtToken.isBlank()) {
+      throw new TokenAuthenticationException("jwt token is blank");
+    }
+
+    AuthUser authUser = jwtService.resolveJwtToken(jwtToken);
+
+//
+//    AuthUser authUser =
+//        authUserCache
+//            .getByToken(authenticationHeader)
+//            .orElseThrow(() -> new TokenAuthenticationException("Token is not valid"));
 
     UserAuthentication authentication = new UserAuthentication(authUser);
 
