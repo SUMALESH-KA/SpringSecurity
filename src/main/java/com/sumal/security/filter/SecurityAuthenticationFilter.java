@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import lombok.Builder;
+import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,13 +17,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+@Setter
+@Builder
 public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
-  private final AuthenticationManager authenticationManager;
+  private AuthenticationManager authenticationManager;
 
   public SecurityAuthenticationFilter(AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
   }
+
+
 
   @Override
   protected void doFilterInternal(
@@ -48,4 +54,8 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
     filterChain.doFilter(request, response);
   }
+
+//  public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+//    this.authenticationManager = authenticationManager;
+//  }
 }

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,17 +34,20 @@ public class SecurityConfig {
 
   private final ApiKeyFilter ApiKeyFilter;
 
+  private final CustomSecurityConfigurer customSecurityConfigurer;
+
   public SecurityConfig(
-      SecurityAuthenticationFilter securityAuthenticationFilter,
-      AuthenticationEntryPoint authenticationEntryPoint,
-      AccessDeniedHandler accessDeniedHandler,
-      JwtTokenFilter JwtTokenFilter,ApiKeyFilter ApiKeyFilter) {
+          SecurityAuthenticationFilter securityAuthenticationFilter,
+          AuthenticationEntryPoint authenticationEntryPoint,
+          AccessDeniedHandler accessDeniedHandler,
+          JwtTokenFilter JwtTokenFilter, ApiKeyFilter ApiKeyFilter, CustomSecurityConfigurer customSecurityConfigurer) {
 
     this.securityAuthenticationFilter = securityAuthenticationFilter;
     this.authenticationEntryPoint = authenticationEntryPoint;
     this.accessDeniedHandler = accessDeniedHandler;
     this.JwtTokenFilter = JwtTokenFilter;
     this.ApiKeyFilter = ApiKeyFilter;
+      this.customSecurityConfigurer = customSecurityConfigurer;
   }
 
   @Bean
@@ -54,9 +58,8 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    http.addFilterBefore(securityAuthenticationFilter,AuthorizationFilter.class)
-            .addFilterBefore(JwtTokenFilter,SecurityAuthenticationFilter.class)
-            .addFilterBefore(ApiKeyFilter,JwtTokenFilter.class)
+    //this where we chnage it
+    http.with(customSecurityConfigurer, Customizer.withDefaults())
         .authorizeHttpRequests(
             mather ->
                 mather
@@ -65,14 +68,8 @@ public class SecurityConfig {
                         "/swagger-ui/*",
                         "/v3/api-docs",
                         "/v3/api-docs/swagger-config")
-                    .permitAll())
-        .authorizeHttpRequests(
-            matcher ->
-                matcher
-                    // method security will be evaluated after DSL configs,
-                    // so we have to define public paths upfront
-                    .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users")
-                    .permitAll())
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll())
         .authorizeHttpRequests(matcher -> matcher.anyRequest().authenticated())
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(

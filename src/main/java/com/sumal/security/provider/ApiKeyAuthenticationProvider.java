@@ -4,10 +4,12 @@ import com.sumal.config.properties.ApiKeyClientsProperties;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
 
     private final Map<String, String> apiKeysToClientIds;
