@@ -1,6 +1,8 @@
 package com.sumal.config;
 
 
+import com.sumal.security.filter.ApiKeyFilter;
+import com.sumal.security.filter.JwtTokenFilter;
 import com.sumal.security.filter.SecurityAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,14 +29,21 @@ public class SecurityConfig {
 
   private final AccessDeniedHandler accessDeniedHandler;
 
+  private final JwtTokenFilter JwtTokenFilter;
+
+  private final ApiKeyFilter ApiKeyFilter;
+
   public SecurityConfig(
       SecurityAuthenticationFilter securityAuthenticationFilter,
       AuthenticationEntryPoint authenticationEntryPoint,
-      AccessDeniedHandler accessDeniedHandler) {
+      AccessDeniedHandler accessDeniedHandler,
+      JwtTokenFilter JwtTokenFilter,ApiKeyFilter ApiKeyFilter) {
 
     this.securityAuthenticationFilter = securityAuthenticationFilter;
     this.authenticationEntryPoint = authenticationEntryPoint;
     this.accessDeniedHandler = accessDeniedHandler;
+    this.JwtTokenFilter = JwtTokenFilter;
+    this.ApiKeyFilter = ApiKeyFilter;
   }
 
   @Bean
@@ -45,7 +54,9 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    http.addFilterBefore(securityAuthenticationFilter, AuthorizationFilter.class)
+    http.addFilterBefore(securityAuthenticationFilter,AuthorizationFilter.class)
+            .addFilterBefore(JwtTokenFilter,SecurityAuthenticationFilter.class)
+            .addFilterBefore(ApiKeyFilter,JwtTokenFilter.class)
         .authorizeHttpRequests(
             mather ->
                 mather
@@ -73,11 +84,5 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint));
 
     return http.build();
-  }
-
-  // register NoOp AuthenticationManager to avoid log printed by default autoconfiguration
-  @Bean
-  public AuthenticationManager noOpAuthenticationManager() {
-    return authentication -> null;
   }
 }

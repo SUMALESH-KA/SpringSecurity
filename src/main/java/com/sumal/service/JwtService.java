@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.sumal.common.AuthUserType;
 import com.sumal.common.Role;
 import com.sumal.security.exception.TokenAuthenticationException;
 import com.sumal.security.user.AuthUser;
@@ -46,7 +47,7 @@ public class JwtService {
             List<Role> roles = decodedJWT.getClaim(ROLES_CLAIM).asList(Role.class);
 
 
-            return new AuthUser(userId, roles);
+            return new AuthUser(userId, roles, AuthUserType.INTERNAL);
         } catch (JWTVerificationException exception) {
             throw new TokenAuthenticationException("JWT is not valid");
         }

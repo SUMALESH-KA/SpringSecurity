@@ -1,6 +1,7 @@
 package com.sumal.security.authentication;
 
 
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 import com.sumal.security.user.AuthUser;

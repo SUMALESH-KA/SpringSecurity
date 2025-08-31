@@ -3,6 +3,7 @@ package com.sumal.service;
 
 import java.util.UUID;
 
+import com.sumal.common.AuthUserType;
 import com.sumal.dto.user.UserResponse;
 import com.sumal.dto.user.UserResponseWithCredentials;
 import com.sumal.security.dto.LoginDto;
@@ -42,21 +43,11 @@ public class AuthService {
     if (!passwordEncoder.matches(loginDto.password(), userCredentials.passwordHash())) {
       throw new ApplicationAuthenticationException("Password is incorrect");
     }
-
-//    String token = UUID.randomUUID().toString();
     UserResponse userResponse = userCredentials.userResponse();
 
-    AuthUser authUser = new AuthUser(userResponse.id(), userResponse.roles());
-
-//    authUserCache.login(token, authUser);
-
+    AuthUser authUser = new AuthUser(userResponse.id(), userResponse.roles(), AuthUserType.INTERNAL);
     String jwtToken = jwtService.createJwtToken(authUser);
 
     return new TokenDto(jwtToken);
   }
-
-//  public void logout(String token) {
-//
-//    authUserCache.logout(token);
-//  }
 }
