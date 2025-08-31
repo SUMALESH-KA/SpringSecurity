@@ -40,7 +40,6 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
             authenticationManager.authenticate(unauthenticatedAuthentication);
 
     if (authenticatedAuthentication != null) {
-
       SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
       securityContext.setAuthentication(authenticatedAuthentication);
       SecurityContextHolder.setContext(securityContext);

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 
 @Configuration
-@ConfigurationProperties(prefix = "api-key")
+@ConfigurationProperties(prefix = "security.api-key-clients")
 @Data
 public class ApiKeyClientsProperties {
 

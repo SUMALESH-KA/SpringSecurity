@@ -13,12 +13,10 @@ public record ApiKeyAuthentication(AuthUser authUser, boolean authenticated, Str
         implements Authentication {
 
     public static ApiKeyAuthentication unauthenticated(String apiKey) {
-
         return new ApiKeyAuthentication(null, false, apiKey);
     }
 
     public static ApiKeyAuthentication authenticated(AuthUser authUser) {
-
         return new ApiKeyAuthentication(authUser, true, null);
     }
 

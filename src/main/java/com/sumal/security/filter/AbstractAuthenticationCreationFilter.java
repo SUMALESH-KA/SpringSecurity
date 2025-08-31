@@ -21,12 +21,10 @@ public abstract class AbstractAuthenticationCreationFilter extends OncePerReques
         Authentication builtAuthentication = buildAuthentication(request);
 
         if (builtAuthentication != null) {
-
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(builtAuthentication);
             SecurityContextHolder.setContext(securityContext);
         }
-
         filterChain.doFilter(request, response);
     }
 

@@ -53,36 +53,26 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-    http.addFilterBefore(securityAuthenticationFilter,AuthorizationFilter.class)
-            .addFilterBefore(JwtTokenFilter,SecurityAuthenticationFilter.class)
-            .addFilterBefore(ApiKeyFilter,JwtTokenFilter.class)
-        .authorizeHttpRequests(
-            mather ->
-                mather
+    http
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
                     .requestMatchers(
-                        "/swagger-ui.html",
-                        "/swagger-ui/*",
-                        "/v3/api-docs",
-                        "/v3/api-docs/swagger-config")
-                    .permitAll())
-        .authorizeHttpRequests(
-            matcher ->
-                matcher
-                    // method security will be evaluated after DSL configs,
-                    // so we have to define public paths upfront
-                    .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users")
-                    .permitAll())
-        .authorizeHttpRequests(matcher -> matcher.anyRequest().authenticated())
-        .csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(
-            configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .exceptionHandling(
-            customizer ->
-                customizer
+                            "/swagger-ui.html", "/swagger-ui/**",
+                            "/v3/api-docs", "/v3/api-docs/swagger-config",
+                            "/api/auth/login", "/api/users"
+                    ).permitAll()
+                    .anyRequest().authenticated()
+            )
+            .exceptionHandling(eh -> eh
                     .accessDeniedHandler(accessDeniedHandler)
-                    .authenticationEntryPoint(authenticationEntryPoint));
+                    .authenticationEntryPoint(authenticationEntryPoint)
+            );
+    http.addFilterBefore(securityAuthenticationFilter, AuthorizationFilter.class);
+    http.addFilterBefore(JwtTokenFilter, SecurityAuthenticationFilter.class);
+    http.addFilterBefore(ApiKeyFilter, JwtTokenFilter.class);
 
     return http.build();
   }
+
 }

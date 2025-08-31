@@ -13,12 +13,10 @@ public record JwtAuthentication(AuthUser authUser, boolean authenticated, String
         implements Authentication {
 
     public static JwtAuthentication unauthenticated(String jwtToken) {
-
         return new JwtAuthentication(null, false, jwtToken);
     }
 
     public static JwtAuthentication authenticated(AuthUser authUser) {
-
         return new JwtAuthentication(authUser, true, null);
     }
 
